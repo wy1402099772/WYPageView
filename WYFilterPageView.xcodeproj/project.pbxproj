@@ -15,6 +15,8 @@
 		93D9B68E1C7F187800EEB19A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 93D9B68C1C7F187800EEB19A /* LaunchScreen.storyboard */; };
 		93D9B6991C7F187800EEB19A /* WYFilterPageViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 93D9B6981C7F187800EEB19A /* WYFilterPageViewTests.m */; };
 		93D9B6A41C7F187800EEB19A /* WYFilterPageViewUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 93D9B6A31C7F187800EEB19A /* WYFilterPageViewUITests.m */; };
+		93D9B6B31C7F18B300EEB19A /* WYPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 93D9B6B21C7F18B300EEB19A /* WYPageView.m */; };
+		93D9B6B71C7FE9EA00EEB19A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D9B6B61C7FE9EA00EEB19A /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,9 @@
 		93D9B69F1C7F187800EEB19A /* WYFilterPageViewUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WYFilterPageViewUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		93D9B6A31C7F187800EEB19A /* WYFilterPageViewUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYFilterPageViewUITests.m; sourceTree = "<group>"; };
 		93D9B6A51C7F187800EEB19A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		93D9B6B11C7F18B300EEB19A /* WYPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYPageView.h; sourceTree = "<group>"; };
+		93D9B6B21C7F18B300EEB19A /* WYPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYPageView.m; sourceTree = "<group>"; };
+		93D9B6B61C7FE9EA00EEB19A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93D9B6B71C7FE9EA00EEB19A /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +87,7 @@
 		93D9B6721C7F187800EEB19A = {
 			isa = PBXGroup;
 			children = (
+				93D9B6B61C7FE9EA00EEB19A /* QuartzCore.framework */,
 				93D9B67D1C7F187800EEB19A /* WYFilterPageView */,
 				93D9B6971C7F187800EEB19A /* WYFilterPageViewTests */,
 				93D9B6A21C7F187800EEB19A /* WYFilterPageViewUITests */,
@@ -105,6 +112,8 @@
 				93D9B6821C7F187800EEB19A /* AppDelegate.m */,
 				93D9B6841C7F187800EEB19A /* ViewController.h */,
 				93D9B6851C7F187800EEB19A /* ViewController.m */,
+				93D9B6B11C7F18B300EEB19A /* WYPageView.h */,
+				93D9B6B21C7F18B300EEB19A /* WYPageView.m */,
 				93D9B6871C7F187800EEB19A /* Main.storyboard */,
 				93D9B68A1C7F187800EEB19A /* Assets.xcassets */,
 				93D9B68C1C7F187800EEB19A /* LaunchScreen.storyboard */,
@@ -273,6 +282,7 @@
 				93D9B6861C7F187800EEB19A /* ViewController.m in Sources */,
 				93D9B6831C7F187800EEB19A /* AppDelegate.m in Sources */,
 				93D9B6801C7F187800EEB19A /* main.m in Sources */,
+				93D9B6B31C7F18B300EEB19A /* WYPageView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -498,6 +508,7 @@
 				93D9B6AA1C7F187800EEB19A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		93D9B6AB1C7F187800EEB19A /* Build configuration list for PBXNativeTarget "WYFilterPageViewTests" */ = {
 			isa = XCConfigurationList;
@@ -506,6 +517,7 @@
 				93D9B6AD1C7F187800EEB19A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		93D9B6AE1C7F187800EEB19A /* Build configuration list for PBXNativeTarget "WYFilterPageViewUITests" */ = {
 			isa = XCConfigurationList;
@@ -514,6 +526,7 @@
 				93D9B6B01C7F187800EEB19A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
