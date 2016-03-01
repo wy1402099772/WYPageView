@@ -8,23 +8,17 @@
 
 #import "WYPageView.h"
 
-static CGFloat transformTime = 0.5f;
-static BOOL isTransform = NO;
+static CGFloat transformTime = 0.3f;
 
 @interface WYPageView ()
 {
-    
+    BOOL isTransform;
+    BOOL isFirstViewHide;
 }
 
-@property (nonatomic, strong) UIView *lastView;
-@property (nonatomic, strong) UIView *nextView;
-@property (atomic, strong) NSMutableArray *array;
-
-@property (nonatomic, strong) CABasicAnimation *rightAnimation;
-@property (nonatomic, strong) CABasicAnimation *rightAnimation1;
-
-@property (nonatomic, strong) CABasicAnimation *leftAnimation;
-@property (nonatomic, strong) CABasicAnimation *leftAnimation1;
+@property (nonatomic, strong) NSMutableArray *array;
+@property (nonatomic, strong) UIView *currentView0;
+@property (nonatomic, strong) UIView *currentView1;
 
 @end
 
@@ -32,16 +26,17 @@ static BOOL isTransform = NO;
 
 - (instancetype)initWithFirstView:(UIView *)view andViewArray:(NSMutableArray *)viewArray
 {
-    if(self = [super init])
+    if(self = [super initWithFrame:[UIScreen mainScreen].bounds])
     {
-        self.frame = CGRectMake(0, 0, 375, 667);
         _array = viewArray;
+        isTransform = NO;
+        isFirstViewHide = NO;
+        _currentView0 = view;
+        [self addSubview:_currentView0];
         
-        [self addSubview:self.currentView];
-        [self addSubview:self.lastView];
-        [self addSubview:self.nextView];
+        _currentView1 = nil;
         
-        [self.currentView addSubview:view];
+        [self addSubview:self.swipeView];
         [self initGesture];
     }
     return self;
@@ -57,21 +52,42 @@ static BOOL isTransform = NO;
     leftSwipeGesture.direction = UISwipeGestureRecognizerDirectionLeft;
     
     
-    [self.currentView addGestureRecognizer:rightSwipeGesture];
-    [self.currentView addGestureRecognizer:leftSwipeGesture];
+    [self.swipeView addGestureRecognizer:rightSwipeGesture];
+    [self.swipeView addGestureRecognizer:leftSwipeGesture];
 }
 
 - (void)rightSwipeAction:(UISwipeGestureRecognizer *)sender
 {
     if(isTransform)
         return ;
-    [self loadLastViewOfCurrentView:self.currentView];
-    if([self getSubViewOfView:self.lastView] && UIGestureRecognizerStateEnded == sender.state)
+    if(self.array.count > 1 && UIGestureRecognizerStateEnded == sender.state)
     {
         isTransform = YES;
-        [self.currentView.layer addAnimation:self.rightAnimation forKey:nil];
-        [self.lastView.layer addAnimation:self.rightAnimation1 forKey:nil];
-        [self.currentView.layer setPosition:self.nextView.layer.position];
+        CABasicAnimation *animation0 = [self creatAnimationIsIn:YES andDirectionIsRight:YES];
+        CABasicAnimation *animation1 = [self creatAnimationIsIn:NO andDirectionIsRight:YES];
+        if(isFirstViewHide)
+        {
+            self.currentView0 = [self getlastView:self.currentView1];
+            [self addSubview:self.currentView0];
+            [self.currentView0 setFrame:self.bounds];
+            [self bringSubviewToFront:self.swipeView];
+            [self layoutIfNeeded];
+            [self.currentView0.layer addAnimation:animation0 forKey:nil];
+            [self.currentView1.layer addAnimation:animation1 forKey:nil];
+            [self.currentView1.layer setPosition:[animation1.toValue CGPointValue]];
+        }
+        else
+        {
+            self.currentView1 = [self getlastView:self.currentView0];
+            [self addSubview:self.currentView1];
+            [self.currentView1 setFrame:self.bounds];
+            [self.currentView1 setHidden:YES];
+            [self bringSubviewToFront:self.swipeView];
+            [self layoutIfNeeded];
+            [self.currentView1.layer addAnimation:animation0 forKey:nil];
+            [self.currentView0.layer addAnimation:animation1 forKey:nil];
+            [self.currentView0.layer setPosition:[animation1.toValue CGPointValue]];
+        }
     }
 }
 
@@ -79,179 +95,146 @@ static BOOL isTransform = NO;
 {
     if(isTransform)
         return ;
-    [self loadNextViewOfCurrentView:self.currentView];
-    if([self getSubViewOfView:self.nextView] && UIGestureRecognizerStateEnded == sender.state)
+    if(self.array.count > 1 && UIGestureRecognizerStateEnded == sender.state)
     {
         isTransform = YES;
-        [self.currentView.layer addAnimation:self.leftAnimation forKey:nil];
-        [self.nextView.layer addAnimation:self.leftAnimation1 forKey:nil];
-        [self.currentView.layer setPosition:self.lastView.layer.position];
+        CABasicAnimation *animation0 = [self creatAnimationIsIn:YES andDirectionIsRight:NO];
+        CABasicAnimation *animation1 = [self creatAnimationIsIn:NO andDirectionIsRight:NO];
+        if(isFirstViewHide)
+        {
+            self.currentView0 = [self getlastView:self.currentView1];
+            [self addSubview:self.currentView0];
+            [self.currentView0 setFrame:self.bounds];
+            [self bringSubviewToFront:self.swipeView];
+            [self layoutIfNeeded];
+            [self.currentView0.layer addAnimation:animation0 forKey:nil];
+            [self.currentView1.layer addAnimation:animation1 forKey:nil];
+            [self.currentView1.layer setPosition:[animation1.toValue CGPointValue]];
+        }
+        else
+        {
+            self.currentView1 = [self getlastView:self.currentView0];
+            [self addSubview:self.currentView1];
+            [self.currentView1 setFrame:self.bounds];
+            [self.currentView1 setHidden:YES];
+            [self bringSubviewToFront:self.swipeView];
+            [self layoutIfNeeded];
+            [self.currentView1.layer addAnimation:animation0 forKey:nil];
+            [self.currentView0.layer addAnimation:animation1 forKey:nil];
+            [self.currentView0.layer setPosition:[animation1.toValue CGPointValue]];
+        }
     }
 }
 
-- (CABasicAnimation *)creatAnimation:(NSString *)keyPath from:(UIView *)start to:(UIView *)destination
+- (CABasicAnimation *)creatAnimationIsIn:(BOOL)isIn andDirectionIsRight:(BOOL)isRight
 {
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:keyPath];
-    animation.delegate = self;
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position"];
     animation.duration = transformTime;
     animation.repeatCount = 1;
-    animation.fromValue = [NSValue valueWithCGPoint:start.layer.position];
-    animation.toValue = [NSValue valueWithCGPoint:destination.layer.position];
+    CGPoint startPosition, destinationPosition;
+    if(isIn)
+    {
+        if(isRight)
+        {
+            startPosition = [self getCurrentView].layer.position;
+            startPosition = CGPointMake(startPosition.x - self.frame.size.width, startPosition.y);
+        }
+        else
+        {
+            startPosition = [self getCurrentView].layer.position;
+            startPosition = CGPointMake(startPosition.x + self.frame.size.width, startPosition.y);
+        }
+        destinationPosition = [self getCurrentView].layer.position;
+    }
+    else
+    {
+        animation.delegate = self;
+        startPosition = [self getCurrentView].layer.position;
+        if(isRight)
+        {
+            destinationPosition = [self getCurrentView].layer.position;
+            destinationPosition = CGPointMake(destinationPosition.x + self.frame.size.width, destinationPosition.y);
+        }
+        else
+        {
+            destinationPosition = [self getCurrentView].layer.position;
+            destinationPosition = CGPointMake(destinationPosition.x - self.frame.size.width, destinationPosition.y);
+        }
+    }
+    animation.fromValue = [NSValue valueWithCGPoint:startPosition];
+    animation.toValue = [NSValue valueWithCGPoint:destinationPosition];
     return animation;
 }
 
-- (void)loadLastViewOfCurrentView:(UIView *)currentView
+- (UIView *)getCurrentView
 {
-    UIView *currentSubView = [self getSubViewOfView:currentView];
-    if(self.lastView && [self getSubViewOfView:self.lastView])
-        [[self getSubViewOfView:self.lastView] removeFromSuperview];
-    if(self.dataSource && [self.dataSource respondsToSelector:@selector(pageView:lastViewOfCurrentView:)])
-    {
-        UIView *tmpLastSubView = [self.dataSource pageView:self lastViewOfCurrentView:currentSubView];
-        [self.lastView addSubview:tmpLastSubView];
-    }
-}
-
-- (void)loadNextViewOfCurrentView:(UIView *)currentView
-{
-    UIView *currentSubView = [self getSubViewOfView:currentView];
-    if(self.nextView && [self getSubViewOfView:self.nextView])
-        [[self getSubViewOfView:self.nextView] removeFromSuperview];
-    
-    if(self.dataSource && [self.dataSource respondsToSelector:@selector(pageView:nextViewOfCurrentView:)])
-    {
-        UIView *tmpNextSubView = [self.dataSource pageView:self nextViewOfCurrentView:currentSubView];
-        [self.nextView addSubview:tmpNextSubView];
-    }
-}
-
-- (UIView *)getSubViewOfView:(UIView *)view
-{
-    if([view subviews].count)
-    {
-        return [view subviews][0];
-    }
+    if(isFirstViewHide)
+        return self.currentView1;
     else
-        return nil;
+        return self.currentView0;
 }
+
+- (UIView *)getNextView:(UIView *)currentView
+{
+    NSUInteger index = [self.array indexOfObject:currentView];
+    if (NSNotFound == index || self.array.count - 1 == index) {
+        return self.array[0];
+    }
+    else{
+        return self.array[index + 1];
+    }
+}
+
+- (UIView *)getlastView:(UIView *)currentView
+{
+    NSUInteger index = [self.array indexOfObject:currentView];
+    if (NSNotFound == index || 0  == index) {
+        return [self.array lastObject];
+    }
+    else{
+        return self.array[index - 1];
+    }
+}
+
 
 #pragma mark - CAAnimationDelegate
-
 - (void)animationDidStart:(CAAnimation *)anim
 {
-    CABasicAnimation *startAnimation = (CABasicAnimation *)anim;
-    CGPoint desPoint = [startAnimation.toValue CGPointValue];
-    if(desPoint.x > CGRectGetMinX(self.frame) && desPoint.x < CGRectGetMaxX(self.frame))
-    {
-        CGPoint startPoint = [startAnimation.fromValue CGPointValue];
-        if(startPoint.x < CGRectGetMinX(self.frame))
-        {
-            if(self.delegate && [self.delegate respondsToSelector:@selector(pageView:willTransitionToView:)])
-            {
-                [self.delegate pageView:self willTransitionToView:self.lastView];
-            }
-            NSLog(@"right from last");
-        }
-        else if (startPoint.x > CGRectGetMaxX(self.frame))
-        {
-            if(self.delegate && [self.delegate respondsToSelector:@selector(pageView:willTransitionToView:)])
-            {
-                [self.delegate pageView:self willTransitionToView:self.nextView];
-            }
-            NSLog(@"left from next");
-        }
-    }
+    if(isFirstViewHide)
+        self.currentView0.hidden = NO;
+    else
+        self.currentView1.hidden = NO;
+    if(self.delegate && [self.delegate respondsToSelector:@selector(pageView:willTransitionToView:)])
+        [self.delegate pageView:self willTransitionToView:isFirstViewHide ? self.currentView0: self.currentView1];
 }
 
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag
 {
-    CABasicAnimation *endAnimation = (CABasicAnimation *)anim;
-    CGPoint desPoint = [endAnimation.toValue CGPointValue];
-    if(desPoint.x > CGRectGetMinX(self.frame) && desPoint.x < CGRectGetMaxX(self.frame))
+    if(isFirstViewHide)
     {
-        CGPoint startPoint = [endAnimation.fromValue CGPointValue];
-        if(startPoint.x < CGRectGetMinX(self.frame))
-        {
-            [[self getSubViewOfView:self.currentView] removeFromSuperview];
-            [self.currentView addSubview:[self getSubViewOfView:self.lastView]];
-            NSLog(@"right swipe stop");
-        }
-        else if (startPoint.x > CGRectGetMaxX(self.frame))
-        {[[self getSubViewOfView:self.currentView] removeFromSuperview];
-            [self.currentView addSubview:[self getSubViewOfView:self.nextView]];
-            NSLog(@"left swipe stop");
-        }
-        [self.currentView.layer setPosition:desPoint];
-        isTransform = NO;
-        if(self.delegate && [self.delegate respondsToSelector:@selector(pageView:didTransitionToView:)])
-            [self.delegate pageView:self didTransitionToView:self.currentView];
+        [self.currentView1 setHidden:YES];
+        [self.currentView1 removeFromSuperview];
     }
+    else
+    {
+        [self.currentView0 setHidden:YES];
+        [self.currentView0 removeFromSuperview];
+    }
+    isTransform = NO;
+    isFirstViewHide = !isFirstViewHide;
+    if(self.delegate && [self.delegate respondsToSelector:@selector(pageView:didTransitionToView:)])
+        [self.delegate pageView:self didTransitionToView:isFirstViewHide ? self.currentView1: self.currentView0];
 }
 
 #pragma mark - getter
-- (UIView *)currentView
+- (UIView *)swipeView
 {
-    if(!_currentView)
+    if(!_swipeView)
     {
-        _currentView = [[UIView alloc] initWithFrame:self.frame];
+        _swipeView = [[UIView alloc] initWithFrame:self.bounds];
     }
-    return _currentView;
+    return _swipeView;
 }
 
-- (UIView *)lastView
-{
-    if(!_lastView)
-    {
-        CGRect rect = self.currentView.frame;
-        _lastView = [[UIView alloc] initWithFrame:CGRectMake(rect.origin.x - self.frame.size.width, rect.origin.y, rect.size.width, rect.size.height)];
-    }
-    return _lastView;
-}
-
-- (UIView *)nextView
-{
-    if(!_nextView)
-    {
-        CGRect rect = self.currentView.frame;
-        _nextView = [[UIView alloc] initWithFrame:CGRectMake(rect.origin.x + self.frame.size.width, rect.origin.y, rect.size.width, rect.size.height)];
-    }
-    return _nextView;
-}
-
-- (CABasicAnimation *)rightAnimation
-{
-    if(!_rightAnimation)
-    {
-        _rightAnimation = [self creatAnimation:@"position" from:self.currentView to:self.nextView];
-    }
-    return _rightAnimation;
-}
-
-- (CABasicAnimation *)rightAnimation1
-{
-    if(!_rightAnimation1)
-    {
-        _rightAnimation1 = [self creatAnimation:@"position" from:self.lastView to:self.currentView];
-    }
-    return _rightAnimation1;
-}
-
-- (CABasicAnimation *)leftAnimation
-{
-    if(!_leftAnimation)
-    {
-        _leftAnimation = [self creatAnimation:@"position" from:self.currentView to:self.lastView];
-    }
-    return _leftAnimation;
-}
-
-- (CABasicAnimation *)leftAnimation1
-{
-    if(!_leftAnimation1)
-    {
-        _leftAnimation1 = [self creatAnimation:@"position" from:self.nextView to:self.currentView];
-    }
-    return _leftAnimation1;
-}
 
 @end

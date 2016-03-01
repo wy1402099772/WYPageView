@@ -13,18 +13,9 @@
 @interface WYPageView : UIView
 
 - (instancetype)initWithFirstView:(UIView *)view andViewArray:(NSMutableArray *)viewArray;
-@property (nonatomic, strong) UIView *currentView;
+@property (nonatomic, strong) UIView *swipeView;
 
 @property (nonatomic, weak) id<WYPageViewDataDelegate> delegate;
-@property (nonatomic, weak) id<WYPageViewDataSource> dataSource;
-
-@end
-
-@protocol WYPageViewDataSource <NSObject>
-
-@required
-- (UIView *)pageView:(WYPageView *)pageView nextViewOfCurrentView:(UIView *)view;
-- (UIView *)pageView:(WYPageView *)pageView lastViewOfCurrentView:(UIView *)view;
 
 @end
 

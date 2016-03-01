@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "WYPageView.h"
 
-@interface ViewController () <WYPageViewDataDelegate, WYPageViewDataSource>
+@interface ViewController () <WYPageViewDataDelegate>
 {
     NSMutableArray *array;
 }
@@ -31,9 +31,7 @@
     _lastView.layer.borderColor = [UIColor greenColor].CGColor;
     _lastView.layer.borderWidth = 20;
     [array addObjectsFromArray:@[ _currentView, _lastView, _nextView]];
-    WYPageView *pageView = [[WYPageView alloc] initWithFirstView:_currentView andViewArray:nil];
-    pageView.delegate = self;
-    pageView.dataSource = self;
+    WYPageView *pageView = [[WYPageView alloc] initWithFirstView:_currentView andViewArray:array];
     [self.view addSubview:pageView];
     
     // Do any additional setup after loading the view, typically from a nib.
